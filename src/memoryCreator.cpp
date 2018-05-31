@@ -15,6 +15,8 @@ int litstrStart, litstrLimit;
 int dataNumStart, dataNumLimit;
 int datastrStart, datastrLimit;
 int workloadStart, workloadLimit;
+
+char *pMem;
 /*
 have in midn that we have to work in this segments too
 A,B,C,D,E,
@@ -80,17 +82,15 @@ void readMemg(string memg)
     fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
 }
 
-
-int main(int argc, char *argv[])
+int createMemory(int argc , string memName)
 {
-    readMemg(".memg");
     if (argc != 2)
     {
         cerr << "Usage control: <shmname>" << endl;
         return 1;
     }
 
-    int shm = shm_open(argv[1], O_CREAT | O_RDWR | O_EXCL, 0600);
+    int shm = shm_open(memName.c_str(), O_CREAT | O_RDWR | O_EXCL, 0600);
 
     if (shm == -1)
     {
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    char *pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
+    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
                                           MAP_SHARED, shm, 0));
 
     if ((void *)pMem == (void *)-1)
@@ -114,10 +114,15 @@ int main(int argc, char *argv[])
         cerr << "Problems with memory map" << endl;
         return 1;
     }
+}
 
+int main(int argc, char *argv[])
+{
+    readMemg(".memg");
+    createMemory(argc, argv[1]);
     int *pInt = (int *)pMem + 500;
 
-    //
+    //writing something in memory
     char c = 'a';
     int number = 0;
 
