@@ -68,7 +68,7 @@ void readMemg(string memg)
     fileToRead >> clean >> clean;
     fileToRead >> hex >> datastrStart;
     fileToRead >> clean;
-    fileToRead >> hex >> dataNumLimit;
+    fileToRead >> hex >> datastrLimit;
     // cout << "limits of datastr: 1 :" << datastrStart << " 2: " << datastrLimit << endl;
 
     //reading and cleaning from format file (workload)
@@ -119,49 +119,53 @@ int createMemory(int argc , string memName)
 /*this method, as it says , do the calculation (if needed) to ajust the memory
 to a multiple of 4, and also moves 2 places the bits (same as multiply by 4) 
 
-NOTE: I DO NOT KNOW YET HOW TO LIMIT WHERE TO STOP THE POINTER (MAYBE MODULO OR
+NOTES: 
+ 1) I DO NOT KNOW YET HOW TO LIMIT WHERE TO STOP THE POINTER (MAYBE MODULO OR
 ERROR)
+
+2) we only have to ajust datasrt and datanum, because the bumners are already 
+stored in  multiple of 4 
 */
 void ajustMemory()
 {
+    int tempValue;
     //memg memory starts with no problem or ajust 
     memgStart<<=2; memgLimit<<=2;
     cout << "memg: " << hex << memgStart << endl;
 
-    // ajusting the start position of litNum
+    // start position of litNum
     litnumStart<<=2; litnumLimit<<=2;
     // cout << "litnumStart: " << litnumStart << " litnumLimit:" << litnumLimit << endl;
     litnumStart += litnumLimit;
-    if(litnumStart%4 != 0) litnumStart -= (litnumStart%4) + 4;
     cout << hex << "litnum: " << litnumStart << endl;
 
-    /*BUG IN HERE TO SEE*/
     //ajusting the start position of litstr
-    litstrStart<<=2; litstrLimit<<=2;
-    cout << " litstrStart: " << litstrStart << endl;
+    litstrStart<<=2; 
+    // cout << " litstrStart: " << hex <<litstrStart << endl;
     litstrStart += litstrLimit;
-    if(litstrStart%4 != 0) litstrStart -= (litstrStart%4) + 4;
-    cout << hex << "litstr: " << litstrStart << endl;
+    // cout << " litstrStart: " << hex << litstrStart << endl;
+    // cout << " test:" << hex << litstrStart << " " << hex << litstrStart - (litstrStart%4) + 4 << endl;
+    if(litstrStart%4 != 0) litstrStart = litstrStart - (litstrStart%4) + 4;
+    cout << "litstr: " << hex <<litstrStart << endl;
 
     //ajusting the start position of dataNum
+    // cout << "dataNumStart: " << dataNumStart << " dataNumLimit: " << dataNumLimit << endl;
     dataNumStart<<=2; dataNumLimit<<=2;
     dataNumStart += dataNumLimit;
-    if(dataNumStart %4 != 0) dataNumStart -= (dataNumStart%4) + 4;
-    cout << hex << "dataNum: " << dataNumStart << endl;
+    cout << "dataNum: " << hex << dataNumStart << endl;
 
-    datastrStart<<=2; datastrLimit<<=2;
+    //ajusting the start position of dataStr
+    // cout << "datastrStart: " << datastrStart << " datastrLimit: " << datastrLimit << endl;
+    datastrStart<<=2; 
     datastrStart += datastrLimit;
-    if(datastrStart%4 != 0) datastrStart -= (datastrStart%4) + 4;
+    if(datastrStart%4 != 0) datastrStart = datastrStart - (datastrStart%4) + 4;
     cout << hex << "datastr: " << datastrStart << endl;
 
-
+    //ajusting the start position of workload
     workloadStart<<=2; workloadLimit<<=2;
     workloadStart += workloadLimit;
-    if(workloadStart%4 != 0) workloadStart -= (workloadStart%4) + 4;
     cout << hex << "workload: " << workloadStart << endl;
     
-
-
 }
 
 int main(int argc, char *argv[])
