@@ -16,7 +16,15 @@ int dataNumStart, dataNumLimit;
 int datastrStart, datastrLimit;
 int workloadStart, workloadLimit;
 
+// pointers to the memory segments
 char *pMem;
+int *litnum;
+char *litstr;
+int *datanum;
+char *datasrt;
+int *workload;  // have my doubts about what is the type of the workload
+
+
 /*
 have in midn that we have to work in this segments too
 A,B,C,D,E,
@@ -82,7 +90,7 @@ void readMemg(string memg)
     fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
 }
 
-int createMemory(int argc , string memName)
+int createMemory(int argc, string memName)
 {
     if (argc != 2)
     {
@@ -98,7 +106,7 @@ int createMemory(int argc , string memName)
         return 1;
     }
 
-    off_t size_mem = 1000;
+    off_t size_mem = workloadStart + 1000; // have to change the size acording to .memgdescription
 
     if (ftruncate(shm, size_mem) == -1)
     {
@@ -106,8 +114,9 @@ int createMemory(int argc , string memName)
         return 1;
     }
 
+    // pMem start, im not using memgStart
     pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
-                                          MAP_SHARED, shm, 0));
+                                    MAP_SHARED, shm, 0));  
 
     if ((void *)pMem == (void *)-1)
     {
@@ -129,50 +138,77 @@ stored in  multiple of 4
 void ajustMemory()
 {
     int tempValue;
-    //memg memory starts with no problem or ajust 
-    memgStart<<=2; memgLimit<<=2;
+    //memg memory starts with no problem or ajust
+    memgStart <<= 2;
+    memgLimit <<= 2;
     cout << "memg: " << hex << memgStart << endl;
 
     // start position of litNum
-    litnumStart<<=2; litnumLimit<<=2;
+    litnumStart <<= 2;
+    litnumLimit <<= 2;
     // cout << "litnumStart: " << litnumStart << " litnumLimit:" << litnumLimit << endl;
     litnumStart += litnumLimit;
     cout << hex << "litnum: " << litnumStart << endl;
 
     //ajusting the start position of litstr
-    litstrStart<<=2; 
+    litstrStart <<= 2;
     // cout << " litstrStart: " << hex <<litstrStart << endl;
     litstrStart += litstrLimit;
     // cout << " litstrStart: " << hex << litstrStart << endl;
     // cout << " test:" << hex << litstrStart << " " << hex << litstrStart - (litstrStart%4) + 4 << endl;
-    if(litstrStart%4 != 0) litstrStart = litstrStart - (litstrStart%4) + 4;
-    cout << "litstr: " << hex <<litstrStart << endl;
+    if (litstrStart % 4 != 0)
+        litstrStart = litstrStart - (litstrStart % 4) + 4;
+    cout << "litstr: " << hex << litstrStart << endl;
 
     //ajusting the start position of dataNum
     // cout << "dataNumStart: " << dataNumStart << " dataNumLimit: " << dataNumLimit << endl;
-    dataNumStart<<=2; dataNumLimit<<=2;
+    dataNumStart <<= 2;
+    dataNumLimit <<= 2;
     dataNumStart += dataNumLimit;
     cout << "dataNum: " << hex << dataNumStart << endl;
 
     //ajusting the start position of dataStr
     // cout << "datastrStart: " << datastrStart << " datastrLimit: " << datastrLimit << endl;
-    datastrStart<<=2; 
+    datastrStart <<= 2;
     datastrStart += datastrLimit;
-    if(datastrStart%4 != 0) datastrStart = datastrStart - (datastrStart%4) + 4;
+    if (datastrStart % 4 != 0)
+        datastrStart = datastrStart - (datastrStart % 4) + 4;
     cout << hex << "datastr: " << datastrStart << endl;
 
     //ajusting the start position of workload
-    workloadStart<<=2; workloadLimit<<=2;
+    workloadStart <<= 2;
+    workloadLimit <<= 2;
     workloadStart += workloadLimit;
     cout << hex << "workload: " << workloadStart << endl;
+}
+
+void asingPointers()
+{
+
+    litnum = (int *)(pMem + litnumStart);
+    // *litnum = 33; // testing
+    // *(litnum+1) = 34; // testing
     
+    litstr = (char *)(pMem + litstrStart);
+    // *litstr = 'h';  // testing
+    // *(litstr+1) = 'o'; // testing
+    // *(litstr+2) = 'l'; // testing
+    // *(litstr+3) = '\0'; // testing
+    
+    datanum = (int *)(pMem + dataNumStart);
+    datasrt = (char*)(pMem + datastrStart);
+    workload = (int*)(pMem + workloadStart);
+
+    // datanum = (int *)(dataNumStart);
+    // *workload;
 }
 
 int main(int argc, char *argv[])
 {
-    readMemg(".memg");
-    createMemory(argc, argv[1]);
+    readMemg(".memg"); 
     ajustMemory();
+    createMemory(argc, argv[1]);    
+    asingPointers();
     // int *pInt = (int *)(pMem + 500);
 
     // //writing something in memory
@@ -190,7 +226,7 @@ int main(int argc, char *argv[])
 
     //     // writing a number in this position of memory just for test
     //     *(pInt) = 1;
-    //     // *(pInt+1) = (int32_t)34;        
+    //     // *(pInt+1) = (int32_t)34;
     //     // for (int i = 0; i < 125; ++i)
     //     // {
     //     //     *(pInt + i) = i;
