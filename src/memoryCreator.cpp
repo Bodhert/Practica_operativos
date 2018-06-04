@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
@@ -32,58 +34,78 @@ in wich i have no idea what to do with them
 */
 
 /* in this method i have a doubt about if the .memg is always 15??*/
-void readMemg(string memg)
+void readMemg(string mew)
 {
-    if (memg != ".memg")
-    {
-        cout << "memory format has to be .memg" << endl;
-        return;
-    }
+    // if (mew != ".mew")
+    // {
+    //     cout << "memory format has to be .mew" << endl;
+    //     return;
+    // }
 
-    ifstream fileToRead(memg);
-
+    ifstream fileToRead(mew);
     char clean;
+    string hexString;
 
-    //reading and cleaning 0:0x0000 - 0000F (memg segment)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> memgStart; // >> hex, converts to int given the format
-    fileToRead >> clean;
-    fileToRead >> hex >> memgLimit;
-    // cout << "limits of .memg: 1 :" << memgStart << " 2: " << memgLimit << endl;
-
+    // reding and cleaning 00:0x00000000F
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterMemgStart(hexString);  // parsing to hex
+    converterMemgStart >> hex >> memgStart;
+    fileToRead >> setw(4) >> hexString;
+    stringstream converterMemgLimit(hexString);
+    converterMemgLimit >> hex >> memgLimit;        
+    // cout << "limits of .memg: 1 : " << memgStart << " 2: " << memgLimit << endl;
+    
+    
+    
     //reading and cleaning from format file  (litnum)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> litnumStart;
-    fileToRead >> clean;
-    fileToRead >> hex >> litnumLimit;
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterlitnumStart(hexString);  // parsing to hex            
+    converterlitnumStart >> hex >> litnumStart;
+    fileToRead >> setw(4) >> hexString;
+    stringstream converterlitnumLimit(hexString);
+    converterlitnumLimit >> hex >> litnumLimit;        
     // cout << "limits of litnum: 1 :" << litnumStart << " 2: " << litnumLimit << endl;
 
     // reading and cleanig from format file (litstr)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> litstrStart;
-    fileToRead >> clean;
-    fileToRead >> hex >> litstrLimit;
-    // cout << "limits of litstr: 1 :" << litstrStart << " 2: " << litstrLimit << endl;
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterlitstrStart(hexString);
+    converterlitstrStart >> hex >> litstrStart;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterlitsrtLimit(hexString);
+    converterlitsrtLimit >> hex >> litstrLimit;
+    cout << "limits of litstr: 1 :" << litstrStart << " 2: " << litstrLimit << endl;
 
     // reading and cleanig from format file (data num)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> dataNumStart;
-    fileToRead >> clean;
-    fileToRead >> hex >> dataNumLimit;
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterdatanumStart(hexString);
+    converterdatanumStart >> hex >> dataNumStart;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterdatanumLimit(hexString);
+    converterdatanumLimit >> hex >> dataNumLimit;
     // cout << "limits of datanum: 1 :" << dataNumStart << " 2: " << dataNumLimit << endl;
 
     //reding and cleaning from format file (datastr)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> datastrStart;
-    fileToRead >> clean;
-    fileToRead >> hex >> datastrLimit;
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterdatastrStart(hexString);
+    converterdatastrStart >> hex >> datastrStart;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterdatastrLimit(hexString);
+    converterdatastrLimit >> hex >> datastrLimit;
     // cout << "limits of datastr: 1 :" << datastrStart << " 2: " << datastrLimit << endl;
 
     //reading and cleaning from format file (workload)
-    fileToRead >> clean >> clean;
-    fileToRead >> hex >> workloadStart;
-    fileToRead >> clean;
-    fileToRead >> hex >> workloadLimit;
+    fileToRead >> clean >> clean >> clean >> clean >> clean;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterworkloadStart(hexString);
+    converterworkloadStart >> hex >> workloadStart;
+    fileToRead >> setw(4) >> hexString; // only grabing next 4 chars
+    stringstream converterworkloadLimit(hexString);
+    converterworkloadLimit >> hex >> workloadLimit;
     // cout << "limits of workload: 1 :" << workloadStart << " 2: " << workloadLimit << endl;
 
     fileToRead.seekg(0, fileToRead.beg);
@@ -186,7 +208,7 @@ void asingPointers()
 {
 
     litnum = (int *)(pMem + litnumStart);
-    // *litnum = 33; // testing
+    // *litnum = -1; // testing
     // *(litnum+1) = 34; // testing
     
     litstr = (char *)(pMem + litstrStart);
@@ -205,35 +227,10 @@ void asingPointers()
 
 int main(int argc, char *argv[])
 {
-    readMemg(".memg"); 
+    readMemg(".mew"); 
     ajustMemory();
+    // it may also recieve standard input instead of a file
     createMemory(argc, argv[1]);    
     asingPointers();
-    // int *pInt = (int *)(pMem + 500);
-
-    // //writing something in memory
-    // char c = 'a';
-    // int number = 1;
-
-    // for (;;)
-    // {
-
-    //     for (int i = 0; i < 500; ++i)
-    //     {
-    //         *(pMem + i) = c++;
-    //         c = (c > 'z') ? c = 'a' : c;
-    //     }
-
-    //     // writing a number in this position of memory just for test
-    //     *(pInt) = 1;
-    //     // *(pInt+1) = (int32_t)34;
-    //     // for (int i = 0; i < 125; ++i)
-    //     // {
-    //     //     *(pInt + i) = i;
-    //     // }
-
-    //     sleep(3);
-    // }
-
     return 0;
 }
