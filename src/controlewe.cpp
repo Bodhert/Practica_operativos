@@ -42,12 +42,9 @@ void assignDataNum(int pos, int num)
 }
 
 // how do i know where the last pinter was...
-void assignDataString(int pos, string word)
+void assignDataString(int pos, char word)
 {
-    for(int i = 0; i < word.size();++i)
-    {
-        *(litstr+i) = word[i];
-    }
+    *(litstr+pos) = word;
 }
 
 void ajustMemory()
@@ -232,11 +229,25 @@ void readMemg(string mew)
     while(!fileToRead.eof())
     {
         int string_;
-        string word, clean;
+        string word_, clean;
         fileToRead >> setw(2) >> clean; 
-        fileToRead >> word;
-        cout << word << endl;
-        assignDataString(posDs++, word);
+        fileToRead >>  word_;
+        // cout << hex << word_ << endl;
+        for(int j = 0; j < word_.size(); j+=2)
+        {
+
+            // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
+            string hexChar = "";
+            hexChar += word_[j]; hexChar += word_[j+1];
+            cout << "hex: " << hexChar << endl;
+            istringstream converter(hexChar);
+            converter.flags(ios::hex);
+            int i;
+            converter >> hex >> i;
+            cout << "conversion: " << char(i) << endl;
+            assignDataString(posDs++, char(i));
+
+        }
     }
 
 
