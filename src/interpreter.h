@@ -1,0 +1,45 @@
+#pragma once
+#include <semaphore.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <iostream>
+#include <fstream>
+#include <string.h>
+#include <bits/stdc++.h>
+#include <map>
+#include <pthread.h>
+
+using namespace std;
+
+class Interpreter{
+
+	int *memg;
+ 	int *litnum;
+ 	int *litstr;
+ 	int *datanum;
+ 	char *datastr;
+ 	sem_t *workload;
+
+
+
+public:
+	Interpreter(int *memgin, int *litnumin, int *litstrin, int *datanumin char *datastrin, sem_t *workloadin);
+  ~Interpreter();
+  void writeMemg(string nameFile,int limit, int *memg,int *litnum,int limiteNum,int *litstr,int limiteStr);
+  int readMemg(int *memg, int pos);
+  int readLitnum(int *litnum, int pos);
+  char* readLitstr(int *litstr, int pos, int limite);
+  char* readDatastr(char *datastr, int pos, int tamano,int politica);
+  int readDatanum(int *datanum, int pos,int politica);
+  void writeDatastr(char *datastr, int pos, char* data,int politica);
+  void writeDatanum(int *datanum, int pos, int data,int politica);
+  int interprete(int opcode, string value,int pc);
+  void proceso(string file);
+};
