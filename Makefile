@@ -1,14 +1,10 @@
 CXXFLAGS=-std=c++11
-
-all: memoryCreator
-
-memoryCreator: memoryCreator.o
-		$(CXX) -o $@ $^ -lrt
-
-memoryCreator.o: memoryCreator.cpp
-
-
+CC = g++
+SRC = src/main.cpp src/controlewe.cpp
+OBJ = $(SRC:.cpp = .o)
+controlewe: $(OBJ)
+		$(CXX) -std=c++11 -o controlewe $(OBJ) -lrt
 clean:
-	rm -f memoryCreator
-	rm -f *.o *.*~ *~ 
+	rm -f controlewe
+	rm -f src/*.o src/*~
 

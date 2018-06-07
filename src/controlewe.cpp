@@ -1,67 +1,11 @@
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <sstream>
-#include <map>
+#include "controlewe.h"
 
-using namespace std;
-
-
-string memName;
-
-//creating the values of the  memory segements , with initial values of 0
-unsigned int memgStart, memgLimit;
-unsigned int litnumStart, litnumLimit;
-unsigned int litstrStart, litstrLimit;
-unsigned int dataNumStart, dataNumLimit;
-unsigned int datastrStart, datastrLimit;
-unsigned int workloadStart, workloadLimit;
-
-// pointers to the memory segments
-char *pMem;
-int *litnum;
-char *litstr;
-int *datanum;
-char *datasrt;
-int *workload;  // have my doubts about what is the type of the workload
-
-// mascaras de bits
-const int maskBase = 0xFFFF0000;
-const int maskLimit = 0xFFFF;
-
-// politicas
-map<int,char> dataNumPolitics;
-map<int,char> dataStrPolitics;
-
-/*
-have in midn that we have to work in this segments too
-A,B,C,D,E,
-in wich i have no idea what to do with them
-*/
-
-// depends of the file i can read 4 with 
-// change later to read with binary
-
-// mejorar el calculo de los apuntadores
-
-void assignDataNum(int pos, int num)
+controlewe::controlewe(string memoryName, string bews)
 {
-    *(litnum+pos) = num;
+    memName = memoryName;
 }
 
-// how do i know where the last pinter was...
-void assignDataString(int pos, char word)
-{
-    *(litstr+pos) = word;
-}
-
-
-void ajustMemory()
+void controlewe::ajustMemory()
 {
     unsigned int ajust;
     //memg memory starts with no problem or ajust
@@ -109,78 +53,27 @@ void ajustMemory()
     // cout << hex << "workload start : " << workloadStart << " workload limit: " << workloadLimit << endl;
 }
 
-void asingPointers()
+void controlewe::readMemg(string mew)
 {
-
-    litnum = (int *)(pMem + litnumStart);
-    // *litnum = -1; // testing
-    // *(litnum+1) = 34; // testing
-    
-    litstr = (char *)(pMem + litstrStart);
-    // *litstr = 'h';  // testing
-    // *(litstr+1) = 'o'; // testing
-    // *(litstr+2) = 'l'; // testing
-    // *(litstr+3) = '\0'; // testing
-    
-    datanum = (int *)(pMem + dataNumStart);
-    datasrt = (char*)(pMem + datastrStart);
-    workload = (int*)(pMem + workloadStart);
-
-    // datanum = (int *)(dataNumStart);
-    // *workload;
-}
-
-int createMemory()
-{
-    int shm = shm_open(memName.c_str(), O_CREAT | O_RDWR | O_EXCL, 0600);
-
-    if (shm == -1)
-    {
-        cerr << "Shared memory already created" << endl;
-        return 1;
-    }
-
-    off_t size_mem = workloadLimit; // have to change the size acording to .memgdescription
-
-    if (ftruncate(shm, size_mem) == -1)
-    {
-        cerr << "Problems with memory size" << endl;
-        return 1;
-    }
-
-    // pMem start, im not using memgStart
-    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
-                                    MAP_SHARED, shm, 0));  
-
-    if ((void *)pMem == (void *)-1)
-    {
-        cerr << "Problems with memory map" << endl;
-        return 1;
-    }
-}
-
-void readMemg(string mew)
-{
-    
     unsigned int linesPrioReaders , linesPrioWriters, block , noControl;
     unsigned int litnumLines , datanumLines;
-    
+
     ifstream fileToRead(mew.c_str(), ios::binary);
     for(int i = 0; i < 10; ++i)
     {
         unsigned int hexNum, base ,  limit;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
-        
+
         base = (hexNum & maskBase) >> 16; // geting the base and limit
         limit = (hexNum & maskLimit);
-        
-        // cout << hex << "base: " << base << " limite: " << limit << endl;  
+
+        // cout << hex << "base: " << base << " limite: " << limit << endl;
         switch(i)
         {
             case 0:
                 memgStart = base;
                 memgLimit = limit;
-                // cout << "limits of .memg: base : " << memgStart << " limit: " << memgLimit << endl;    
+                // cout << "limits of .memg: base : " << memgStart << " limit: " << memgLimit << endl;
                 break;
             case 1:
                 litnumStart = base;
@@ -190,7 +83,7 @@ void readMemg(string mew)
             case 2:
                 litstrStart =  base;
                 litstrLimit = limit;
-                break;                
+                break;
             case 3:
                 dataNumStart = base;
                 dataNumLimit = limit;
@@ -272,7 +165,7 @@ void readMemg(string mew)
 
     ajustMemory();
     createMemory();
-    asingPointers();
+    assingPointers();
 
     // reading and saving literal num
     // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
@@ -280,7 +173,7 @@ void readMemg(string mew)
     {
         // cout << "i:" << i << en
        int num,  hexNum;
-       fileToRead.read((char *)&hexNum, sizeof(int));    
+       fileToRead.read((char *)&hexNum, sizeof(int));
        int signedNum = static_cast<int>(hexNum);
     //    cout << "num: " << dec << signedNum << endl;
        assignDataNum(i,signedNum);
@@ -290,7 +183,7 @@ void readMemg(string mew)
     int hexNum;
     while(fileToRead.read((char *)&hexNum, sizeof(int)))
     {
-                    
+
         string word_, clean;
         // cout << hex << hexNum << endl;
         stringstream ss;
@@ -298,7 +191,7 @@ void readMemg(string mew)
         word_ = ss.str();
         // cout << "word_"   << word_ << endl;
         for(int j = 0; j < word_.size(); j+=2)
-        {            
+        {
             // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
             string hexChar = "";
             hexChar += word_[j]; hexChar += word_[j+1];
@@ -317,40 +210,67 @@ void readMemg(string mew)
     fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
 }
 
-
-
-/*this method, as it says , do the calculation (if needed) to ajust the memory
-to a multiple of 4, and also moves 2 places the bits (same as multiply by 4) 
-
-NOTES: 
- 1) I DO NOT KNOW YET HOW TO LIMIT WHERE TO STOP THE POINTER (MAYBE MODULO OR
-ERROR)
-
-2) we only have to ajust datasrt and datanum, because the bumners are already 
-stored in  multiple of 4 
-*/
-
-int main(int argc, char *argv[])
+int controlewe::createMemory()
 {
-    string arg1 = (argc > 1) ?  string(argv[1]) : "" ;
-    string arg2 = (argc > 2) ?  string(argv[2]) : "" ;
-    string arg3 = (argc > 3) ?  string(argv[3]) : "" ;
-    
-    if(arg1 != "-n")
+    int shm = shm_open(memName.c_str(), O_CREAT | O_RDWR | O_EXCL, 0600);
+
+    if (shm == -1)
     {
-        // cout << arg1 << endl;
-        cout << "usage -n <nommemcom>" << endl;
-        if(arg2 == "")
-        {
-            // cout << arg2 << "hola" << endl;
-            cout << "usage -n <nommemcom>" << endl;
-            return 1;
-        }
+        cerr << "Shared memory already created" << endl;
         return 1;
     }
 
-    memName = arg2;
-    readMemg(arg3); // only reads segment memg
-    
-    return 0;
+    off_t size_mem = workloadLimit; // have to change the size acording to .memgdescription
+
+    if (ftruncate(shm, size_mem) == -1)
+    {
+        cerr << "Problems with memory size" << endl;
+        return 1;
+    }
+
+    // pMem start, im not using memgStart
+    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
+                                    MAP_SHARED, shm, 0));
+
+    if ((void *)pMem == (void *)-1)
+    {
+        cerr << "Problems with memory map" << endl;
+        return 1;
+    }
+}
+
+void controlewe::assingPointers()
+{
+
+    litnum = (int *)(pMem + litnumStart);
+    // *litnum = -1; // testing
+    // *(litnum+1) = 34; // testing
+
+    litstr = (char *)(pMem + litstrStart);
+    // *litstr = 'h';  // testing
+    // *(litstr+1) = 'o'; // testing
+    // *(litstr+2) = 'l'; // testing
+    // *(litstr+3) = '\0'; // testing
+
+    datanum = (int *)(pMem + dataNumStart);
+    datasrt = (char*)(pMem + datastrStart);
+    workload = (int*)(pMem + workloadStart);
+
+    // datanum = (int *)(dataNumStart);
+    // *workload;
+}
+
+void controlewe::assignDataNum(int pos, int num)
+{
+    *(litnum+pos) = num;
+}
+
+void controlewe::assignDataString(int pos, char word)
+{
+    *(litstr+pos) = word;
+}
+
+controlewe::~controlewe()
+{
+    //dtor
 }
