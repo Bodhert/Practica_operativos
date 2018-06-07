@@ -121,7 +121,7 @@ void controlewe::readMemg(string mew)
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
-        cout << hex << " base A:" << base << " limit A:" << limit << endl;
+        // cout << hex << " base A:" << base << " limit A:" << limit << endl;
         bool isDataNum = base >> 15;
         if(isDataNum) dataNumPolitics[i] = 'L';
         else if(!isDataNum) dataStrPolitics[i] = 'L';
@@ -133,7 +133,7 @@ void controlewe::readMemg(string mew)
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
-        cout << " base:B " << base  << " limit:B " << limit << endl;
+        // cout << " base:B " << base  << " limit:B " << limit << endl;
         bool isDataNum = base >> 15;
         if(isDataNum) dataNumPolitics[i] = 'E';
         else if(!isDataNum) dataStrPolitics[i] = 'E';
@@ -145,7 +145,7 @@ void controlewe::readMemg(string mew)
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
-        cout << " base:C " << base  << " limit:C " << limit << endl;
+        // cout << " base:C " << base  << " limit:C " << limit << endl;
         bool isDataNum = base >> 15;
         if(isDataNum) dataNumPolitics[i] = 'B';
         else if(!isDataNum) dataStrPolitics[i] = 'B';
@@ -157,14 +157,16 @@ void controlewe::readMemg(string mew)
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
-        cout << " baseDDD:" << base  << " limit:" << limit << endl;
+        // cout << " baseDDD:" << base  << " limit:" << limit << endl;
         bool isDataNum = base >> 15;
         if(isDataNum) dataNumPolitics[i] = 'N';
         else if(!isDataNum) dataStrPolitics[i] = 'N';
     }
 
     ajustMemory();
-    createMemory();
+    int iscreated = createMemory();
+    // cout <<  "is" << iscreated << endl;
+    if(iscreated) return; // breaking the control in case that already created the memory
     assingPointers();
 
     // reading and saving literal num
@@ -237,6 +239,8 @@ int controlewe::createMemory()
         cerr << "Problems with memory map" << endl;
         return 1;
     }
+
+    return 0;
 }
 
 void controlewe::assingPointers()

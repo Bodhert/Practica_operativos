@@ -12,19 +12,24 @@ int main(int argc, char *argv[])
     {
         // cout << arg1 << endl;
         cout << "usage -n <nommemcom>" << endl;
+        return 1;
+
         if(arg2 == "")
         {
             // cout << arg2 << "hola" << endl;
             cout << "usage -n <nommemcom>" << endl;
             return 1;
         }
-        return 1;
     }
 
-    cout << arg2 << endl;
+    // cout << arg2 << endl;
 
     controlewe *controler = new controlewe(arg2, "bews");
-    controler->readMemg(arg3);
+
+    if(arg3 == "") cout << "no .mew especified" << endl;
+    else controler->readMemg(arg3); 
+        
+
     //controler->readMemg()
     return 0;
 }
