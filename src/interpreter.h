@@ -15,6 +15,7 @@
 #include <bits/stdc++.h>
 #include <map>
 #include <pthread.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -31,15 +32,15 @@ class Interpreter{
 
 public:
 	Interpreter(int *memgin, int *litnumin, int *litstrin, int *datanumin char *datastrin, sem_t *workloadin);
-  ~Interpreter();
-  void writeMemg(string nameFile,int limit, int *memg,int *litnum,int limiteNum,int *litstr,int limiteStr);
-  int readMemg(int *memg, int pos);
-  int readLitnum(int *litnum, int pos);
-  char* readLitstr(int *litstr, int pos, int limite);
-  char* readDatastr(char *datastr, int pos, int tamano,int politica);
-  int readDatanum(int *datanum, int pos,int politica);
-  void writeDatastr(char *datastr, int pos, char* data,int politica);
-  void writeDatanum(int *datanum, int pos, int data,int politica);
-  int interprete(int opcode, string value,int pc);
-  void proceso(string file);
+  	~Interpreter();
+  	void writeMemg(string nameFile,int limit, int *memg,int *literalnum,int limitNum,int *literalstring,int limitString);
+  	int readMemg(int *memg, int position);
+  	int readLitnum(int *litnum, int position);
+  	char* readLitstr(int *literalstring, int position, int limit);
+  	char* readDatastr(char *datastring, int position, int tamano,int politic);
+  	int readDatanum(int *datanum, int pos,int politic);
+  	void writeDatastr(char *datastring, int position, char* data,int politic);
+  	void writeDatanum(int *datanum, int position, int data,int politic);
+  	int interprete(int opcode, string value,int pc);
+  	void proceso(string file);
 };
