@@ -9,6 +9,9 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <pthread.h>
+#include <iomanip>
+#include <iostream>
 #include <map>
 
 using namespace std;
