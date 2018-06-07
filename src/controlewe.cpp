@@ -76,7 +76,7 @@ void ajustMemory()
     litstrStart <<= 2;
     // cout << " litstrStart: " << hex <<litstrStart << endl;
     ajust = litstrStart + litstrLimit;
-    cout << hex << ajust << endl;
+    // cout << hex << ajust << endl;
     // cout << " litstrStart: " << hex << litstrStart << endl;
     // cout << " test:" << hex << litstrStart << " " << hex << litstrStart - (litstrStart%4) + 4 << endl;
     if (ajust % 4 != 0)
@@ -100,9 +100,9 @@ void ajustMemory()
 
     //ajusting the start position of workload
     workloadStart <<= 2;
-    workloadLimit <<= 2;
+    // workloadLimit <<= 2;
     workloadLimit = workloadStart + workloadLimit;
-    cout << hex << "workload start : " << workloadStart << " workload limit: " << workloadLimit << endl;
+    // cout << hex << "workload start : " << workloadStart << " workload limit: " << workloadLimit << endl;
 }
 
 void asingPointers()
@@ -170,7 +170,7 @@ void readMemg(string mew)
         base = (hexNum & maskBase) >> 16; // geting the base and limit
         limit = (hexNum & maskLimit);
         
-        cout << hex << "base: " << base << " limite: " << limit << endl;  
+        // cout << hex << "base: " << base << " limite: " << limit << endl;  
         switch(i)
         {
             case 0:
@@ -219,56 +219,55 @@ void readMemg(string mew)
     int Numpolicies = linesPrioWriters + linesPrioReaders + block + noControl;
     for(int i = 0; i < Numpolicies; ++i)
     {
-        unsigned base ,  limit , hexNum;;
-        fileToRead.read((char *)&hexNum, sizeof(int));
-        cout << "hexnum: " << hexNum << endl;
+        unsigned int base ,  limit , hexNum;;
+        fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        // cout << "hexnum: " << hexNum << endl;
         base = (hexNum & maskBase) >> 16 ; // geting the base and limit
         limit = (hexNum & maskLimit);
-        cout << " base:" << base << endl << " limit:" << limit << endl;
+        // cout << " base:" << base << endl << " limit:" << limit << endl;
     }
 
     ajustMemory();
     createMemory();
     asingPointers();
 
-    // // reading and saving literal num
-    // // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
-    // for(int i = 0; i < litnumLines; ++i)
-    // {
-    //     // cout << "i:" << i << en
-    //    unsigned int num;
-    //    string numString, clean;
-    //    fileToRead >>  setw(2) >> clean;
-    //    fileToRead >> numString;
-    //    stringstream converter(numString);
-    //    int signedNum = static_cast<int>(num);
-    // //    cout << "num: " << dec << signedNum << endl;
-    //    assignDataNum(i,signedNum);
-    // }
+    // reading and saving literal num
+    // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
+    for(int i = 0; i < litnumLines; ++i)
+    {
+        // cout << "i:" << i << en
+       int num,  hexNum;
+       fileToRead.read((char *)&hexNum, sizeof(int));    
+       int signedNum = static_cast<int>(hexNum);
+    //    cout << "num: " << dec << signedNum << endl;
+       assignDataNum(i,signedNum);
+    }
 
-    // int posDs = 0;
-    // while(!fileToRead.eof())
-    // {
-    //     int string_;
-    //     string word_, clean;
-    //     fileToRead >> setw(2) >> clean; 
-    //     fileToRead >>  word_;
-    //     // cout << hex << word_ << endl;
-    //     for(int j = 0; j < word_.size(); j+=2)
-    //     {
-
-    //         // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
-    //         string hexChar = "";
-    //         hexChar += word_[j]; hexChar += word_[j+1];
-    //         cout << "hex: " << hexChar << endl;
-    //         istringstream converter(hexChar);
-    //         converter.flags(ios::hex);
-    //         int i;
-    //         converter >> hex >> i;
-    //         cout << "conversion: " << char(i) << endl;
-    //         assignDataString(posDs++, char(i));
-    //     }
-    // }
+    int posDs = 0;
+    int hexNum;
+    while(fileToRead.read((char *)&hexNum, sizeof(int)))
+    {
+                    
+        string word_, clean;
+        // cout << hex << hexNum << endl;
+        stringstream ss;
+        ss << hex << hexNum;
+        word_ = ss.str();
+        // cout << "word_"   << word_ << endl;
+        for(int j = 0; j < word_.size(); j+=2)
+        {            
+            // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
+            string hexChar = "";
+            hexChar += word_[j]; hexChar += word_[j+1];
+            // cout << "hex: " << hexChar << endl;
+            istringstream converter(hexChar);
+            converter.flags(ios::hex);
+            int i;
+            converter >> hex >> i;
+            // cout << "conversion: " << char(i) << endl;
+            assignDataString(posDs++, char(i));
+        }
+    }
 
 
     fileToRead.seekg(0, fileToRead.beg);
