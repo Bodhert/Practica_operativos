@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <map>
 
 using namespace std;
 
@@ -33,6 +34,9 @@ int *workload;  // have my doubts about what is the type of the workload
 const int maskBase = 0xFFFF0000;
 const int maskLimit = 0xFFFF;
 
+// politicas
+map<int,char> dataNumPolitics;
+map<int,char> dataStrPolitics;
 
 /*
 have in midn that we have to work in this segments too
@@ -217,14 +221,53 @@ void readMemg(string mew)
 
     // ignoring for the moment, later to see what to do with this policy
     int Numpolicies = linesPrioWriters + linesPrioReaders + block + noControl;
-    for(int i = 0; i < Numpolicies; ++i)
+
+    for(int i = 0; i < linesPrioWriters; ++i)
     {
-        unsigned int base ,  limit , hexNum;;
+        unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
-        // cout << "hexnum: " << hexNum << endl;
-        base = (hexNum & maskBase) >> 16 ; // geting the base and limit
+        base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
-        // cout << " base:" << base << endl << " limit:" << limit << endl;
+        cout << hex << " base A:" << base << " limit A:" << limit << endl;
+        bool isDataNum = base >> 15;
+        if(isDataNum) dataNumPolitics[i] = 'L';
+        else if(!isDataNum) dataStrPolitics[i] = 'L';
+    }
+
+    for(int i = 0; i < linesPrioReaders; ++i)
+    {
+        unsigned int base ,  limit , hexNum;
+        fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        base = (hexNum & maskBase) >> 16;
+        limit = (hexNum & maskLimit);
+        cout << " base:B " << base  << " limit:B " << limit << endl;
+        bool isDataNum = base >> 15;
+        if(isDataNum) dataNumPolitics[i] = 'E';
+        else if(!isDataNum) dataStrPolitics[i] = 'E';
+    }
+
+    for(int i = 0; i < block; ++i)
+    {
+        unsigned int base ,  limit , hexNum;
+        fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        base = (hexNum & maskBase) >> 16;
+        limit = (hexNum & maskLimit);
+        cout << " base:C " << base  << " limit:C " << limit << endl;
+        bool isDataNum = base >> 15;
+        if(isDataNum) dataNumPolitics[i] = 'B';
+        else if(!isDataNum) dataStrPolitics[i] = 'B';
+    }
+
+    for(int i = 0; i < noControl; ++i)
+    {
+        unsigned int base ,  limit , hexNum;
+        fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        base = (hexNum & maskBase) >> 16;
+        limit = (hexNum & maskLimit);
+        cout << " baseDDD:" << base  << " limit:" << limit << endl;
+        bool isDataNum = base >> 15;
+        if(isDataNum) dataNumPolitics[i] = 'N';
+        else if(!isDataNum) dataStrPolitics[i] = 'N';
     }
 
     ajustMemory();
