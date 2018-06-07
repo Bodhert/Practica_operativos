@@ -10,13 +10,16 @@
 
 using namespace std;
 
+
+string memName;
+
 //creating the values of the  memory segements , with initial values of 0
-int memgStart, memgLimit;
-int litnumStart, litnumLimit;
-int litstrStart, litstrLimit;
-int dataNumStart, dataNumLimit;
-int datastrStart, datastrLimit;
-int workloadStart, workloadLimit;
+unsigned int memgStart, memgLimit;
+unsigned int litnumStart, litnumLimit;
+unsigned int litstrStart, litstrLimit;
+unsigned int dataNumStart, dataNumLimit;
+unsigned int datastrStart, datastrLimit;
+unsigned int workloadStart, workloadLimit;
 
 // pointers to the memory segments
 char *pMem;
@@ -25,6 +28,10 @@ char *litstr;
 int *datanum;
 char *datasrt;
 int *workload;  // have my doubts about what is the type of the workload
+
+// mascaras de bits
+const int maskBase = 0xFFFF0000;
+const int maskLimit = 0xFFFF;
 
 
 /*
@@ -35,6 +42,8 @@ in wich i have no idea what to do with them
 
 // depends of the file i can read 4 with 
 // change later to read with binary
+
+// mejorar el calculo de los apuntadores
 
 void assignDataNum(int pos, int num)
 {
@@ -47,50 +56,53 @@ void assignDataString(int pos, char word)
     *(litstr+pos) = word;
 }
 
+
 void ajustMemory()
 {
+    unsigned int ajust;
     //memg memory starts with no problem or ajust
     memgStart <<= 2;
     memgLimit <<= 2;
-    cout << "memg: " << hex << memgStart << endl;
+    // cout << "memg: " << hex << memgStart << endl;
 
     // start position of litNum
     litnumStart <<= 2;
     litnumLimit <<= 2;
     // cout << "litnumStart: " << litnumStart << " litnumLimit:" << litnumLimit << endl;
-    litnumStart += litnumLimit;
-    cout << hex << "litnum: " << litnumStart << endl;
+    litnumLimit += litnumStart;
+    // cout << hex << "litnum start: " << litnumStart << " litnum limit: "  <<  litnumLimit << endl;
 
     //ajusting the start position of litstr
     litstrStart <<= 2;
     // cout << " litstrStart: " << hex <<litstrStart << endl;
-    litstrStart += litstrLimit;
+    ajust = litstrStart + litstrLimit;
+    cout << hex << ajust << endl;
     // cout << " litstrStart: " << hex << litstrStart << endl;
     // cout << " test:" << hex << litstrStart << " " << hex << litstrStart - (litstrStart%4) + 4 << endl;
-    if (litstrStart % 4 != 0)
-        litstrStart = litstrStart - (litstrStart % 4) + 4;
-    cout << "litstr: " << hex << litstrStart << endl;
+    if (ajust % 4 != 0)
+        litstrLimit = ajust - (ajust % 4) + 4;
+    // cout << "litstr start: " << hex << litstrStart << " litsrt limit: " << litstrLimit << endl;
 
     //ajusting the start position of dataNum
     // cout << "dataNumStart: " << dataNumStart << " dataNumLimit: " << dataNumLimit << endl;
     dataNumStart <<= 2;
     dataNumLimit <<= 2;
-    dataNumStart += dataNumLimit;
-    cout << "dataNum: " << hex << dataNumStart << endl;
+    dataNumLimit += dataNumStart;
+    // cout << "dataNum start : " << hex << dataNumStart <<   " dataNum limit" << dataNumLimit << endl;
 
     //ajusting the start position of dataStr
     // cout << "datastrStart: " << datastrStart << " datastrLimit: " << datastrLimit << endl;
     datastrStart <<= 2;
-    datastrStart += datastrLimit;
-    if (datastrStart % 4 != 0)
-        datastrStart = datastrStart - (datastrStart % 4) + 4;
-    cout << hex << "datastr: " << datastrStart << endl;
+    ajust = datastrStart +  datastrLimit ;
+    if (ajust % 4 != 0)
+        datastrLimit = ajust - (ajust % 4) + 4;
+    // cout << hex << "datastr start:  " << datastrStart <<  " datastr limit: "  << datastrLimit << endl;
 
     //ajusting the start position of workload
     workloadStart <<= 2;
     workloadLimit <<= 2;
-    workloadStart += workloadLimit;
-    cout << hex << "workload: " << workloadStart << endl;
+    workloadLimit = workloadStart + workloadLimit;
+    cout << hex << "workload start : " << workloadStart << " workload limit: " << workloadLimit << endl;
 }
 
 void asingPointers()
@@ -114,38 +126,51 @@ void asingPointers()
     // *workload;
 }
 
+int createMemory()
+{
+    int shm = shm_open(memName.c_str(), O_CREAT | O_RDWR | O_EXCL, 0600);
+
+    if (shm == -1)
+    {
+        cerr << "Shared memory already created" << endl;
+        return 1;
+    }
+
+    off_t size_mem = workloadLimit; // have to change the size acording to .memgdescription
+
+    if (ftruncate(shm, size_mem) == -1)
+    {
+        cerr << "Problems with memory size" << endl;
+        return 1;
+    }
+
+    // pMem start, im not using memgStart
+    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
+                                    MAP_SHARED, shm, 0));  
+
+    if ((void *)pMem == (void *)-1)
+    {
+        cerr << "Problems with memory map" << endl;
+        return 1;
+    }
+}
+
 void readMemg(string mew)
 {
-    // int value;
-    // if(fileToRead.is_open())
-    // {
-    //     while(!fileToRead.eof())
-    //     {
-    //         // cout << "hola" << endl;
-    //         // fileToRead.read((char*)&value,sizeof(int));
-    //         fileToRead >> setw(4) >> (char*)&value,sizeof(int); // 
-    //         cout << hex << value << endl;
-    //     }
-    // }
-
-    int linesPrioReaders , linesPrioWriters, block , noControl;
-    int litnumLines , datanumLines;
     
-    ifstream fileToRead(mew.c_str());
+    unsigned int linesPrioReaders , linesPrioWriters, block , noControl;
+    unsigned int litnumLines , datanumLines;
+    
+    ifstream fileToRead(mew.c_str(), ios::binary);
     for(int i = 0; i < 10; ++i)
     {
-        string baseString  , limitString , clean;
-        int base ,  limit;
-        fileToRead >> setw(2) >> clean; 
-        fileToRead >> setw(4) >> baseString >> limitString;
-        stringstream converterbase(baseString);
-        stringstream converterlimit(limitString);
-        converterbase >> hex >> base;
-        converterlimit >> hex >> limit;
+        unsigned int hexNum, base ,  limit;
+        fileToRead.read((char *)&hexNum, sizeof(unsigned int));
         
+        base = (hexNum & maskBase) >> 16; // geting the base and limit
+        limit = (hexNum & maskLimit);
         
-        // cout << baseString << " " << limitString << endl;
-        // cout << hex << base << " " << limit << endl;
+        cout << hex << "base: " << base << " limite: " << limit << endl;  
         switch(i)
         {
             case 0:
@@ -194,95 +219,63 @@ void readMemg(string mew)
     int Numpolicies = linesPrioWriters + linesPrioReaders + block + noControl;
     for(int i = 0; i < Numpolicies; ++i)
     {
-        string baseString  , limitString , clean;
-        int base ,  limit;
-        fileToRead >> setw(2) >> clean; 
-        fileToRead >> setw(4) >> baseString >> limitString;
-        stringstream converterbase(baseString);
-        stringstream converterlimit(limitString);
-        converterbase >> hex >> base;
-        converterlimit >> hex >> limit;
-        // cout << baseString << " " << limitString << endl;
-        // cout << hex << base << " " << limit << endl;
+        unsigned base ,  limit , hexNum;;
+        fileToRead.read((char *)&hexNum, sizeof(int));
+        cout << "hexnum: " << hexNum << endl;
+        base = (hexNum & maskBase) >> 16 ; // geting the base and limit
+        limit = (hexNum & maskLimit);
+        cout << " base:" << base << endl << " limit:" << limit << endl;
     }
 
     ajustMemory();
+    createMemory();
     asingPointers();
 
-    // reading and saving literal num
-    // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
-    for(int i = 0; i < litnumLines; ++i)
-    {
-        // cout << "i:" << i << en
-       unsigned int num;
-       string numString, clean;
-       fileToRead >>  setw(2) >> clean;
-       fileToRead >> numString;
-       stringstream converter(numString);
-       converter >> hex >> num;
-       int signedNum = static_cast<int>(num);
-    //    cout << "num: " << dec << signedNum << endl;
-       assignDataNum(i,signedNum);
-    }
+    // // reading and saving literal num
+    // // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
+    // for(int i = 0; i < litnumLines; ++i)
+    // {
+    //     // cout << "i:" << i << en
+    //    unsigned int num;
+    //    string numString, clean;
+    //    fileToRead >>  setw(2) >> clean;
+    //    fileToRead >> numString;
+    //    stringstream converter(numString);
+    //    int signedNum = static_cast<int>(num);
+    // //    cout << "num: " << dec << signedNum << endl;
+    //    assignDataNum(i,signedNum);
+    // }
 
-    int posDs = 0;
-    while(!fileToRead.eof())
-    {
-        int string_;
-        string word_, clean;
-        fileToRead >> setw(2) >> clean; 
-        fileToRead >>  word_;
-        // cout << hex << word_ << endl;
-        for(int j = 0; j < word_.size(); j+=2)
-        {
+    // int posDs = 0;
+    // while(!fileToRead.eof())
+    // {
+    //     int string_;
+    //     string word_, clean;
+    //     fileToRead >> setw(2) >> clean; 
+    //     fileToRead >>  word_;
+    //     // cout << hex << word_ << endl;
+    //     for(int j = 0; j < word_.size(); j+=2)
+    //     {
 
-            // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
-            string hexChar = "";
-            hexChar += word_[j]; hexChar += word_[j+1];
-            cout << "hex: " << hexChar << endl;
-            istringstream converter(hexChar);
-            converter.flags(ios::hex);
-            int i;
-            converter >> hex >> i;
-            cout << "conversion: " << char(i) << endl;
-            assignDataString(posDs++, char(i));
-
-        }
-    }
+    //         // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
+    //         string hexChar = "";
+    //         hexChar += word_[j]; hexChar += word_[j+1];
+    //         cout << "hex: " << hexChar << endl;
+    //         istringstream converter(hexChar);
+    //         converter.flags(ios::hex);
+    //         int i;
+    //         converter >> hex >> i;
+    //         cout << "conversion: " << char(i) << endl;
+    //         assignDataString(posDs++, char(i));
+    //     }
+    // }
 
 
     fileToRead.seekg(0, fileToRead.beg);
     fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
 }
 
-int createMemory(string memName)
-{
-    int shm = shm_open(memName.c_str(), O_CREAT | O_RDWR | O_EXCL, 0600);
 
-    if (shm == -1)
-    {
-        cerr << "Shared memory already created" << endl;
-        return 1;
-    }
-
-    off_t size_mem = workloadStart + 1000; // have to change the size acording to .memgdescription
-
-    if (ftruncate(shm, size_mem) == -1)
-    {
-        cerr << "Problems with memory size" << endl;
-        return 1;
-    }
-
-    // pMem start, im not using memgStart
-    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
-                                    MAP_SHARED, shm, 0));  
-
-    if ((void *)pMem == (void *)-1)
-    {
-        cerr << "Problems with memory map" << endl;
-        return 1;
-    }
-}
 
 /*this method, as it says , do the calculation (if needed) to ajust the memory
 to a multiple of 4, and also moves 2 places the bits (same as multiply by 4) 
@@ -314,10 +307,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    createMemory(arg2);
-
+    memName = arg2;
     readMemg(arg3); // only reads segment memg
-    // // it may also recieve standard input instead of a file
     
     return 0;
 }
