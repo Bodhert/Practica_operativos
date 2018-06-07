@@ -22,8 +22,8 @@ class controlewe
         void ajustMemory();
         int createMemory();
         void assingPointers();
-        void assignDataNum(int pos, int num);
-        void assignDataString(int pos, char word);
+        void assignDataNum(unsigned int pos, int num);
+        void assignDataString(unsigned int pos, char word);
         virtual ~controlewe();
 
     private:
@@ -37,12 +37,12 @@ class controlewe
         unsigned int workloadStart, workloadLimit;
 
         // pointers to the memory segments
-        char *pMem;
-        int *litnum;
-        char *litstr;
-        int *datanum;
-        char *datasrt;
-        int *workload;  // have my doubts about what is the type of the workload
+        unsigned char *pMem;
+        unsigned int *litnum;
+        unsigned char *litstr;
+        unsigned int *datanum;
+        unsigned char *datasrt;
+        unsigned int *workload;  // have my doubts about what is the type of the workload
 
         // mascaras de bits
         const int maskBase = 0xFFFF0000;

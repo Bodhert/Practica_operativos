@@ -1,5 +1,6 @@
 #include "controlewe.h"
 
+// is only doing mew not bew yet
 controlewe::controlewe(string memoryName, string bews)
 {
     memName = memoryName;
@@ -112,9 +113,6 @@ void controlewe::readMemg(string mew)
         }
     }
 
-    // ignoring for the moment, later to see what to do with this policy
-    int Numpolicies = linesPrioWriters + linesPrioReaders + block + noControl;
-
     for(int i = 0; i < linesPrioWriters; ++i)
     {
         unsigned int base ,  limit , hexNum;
@@ -182,8 +180,8 @@ void controlewe::readMemg(string mew)
     }
 
     int posDs = 0;
-    int hexNum;
-    while(fileToRead.read((char *)&hexNum, sizeof(int)))
+    unsigned int hexNum;
+    while(fileToRead.read((char *)&hexNum, sizeof(unsigned int)))
     {
 
         string word_, clean;
@@ -231,7 +229,7 @@ int controlewe::createMemory()
     }
 
     // pMem start, im not using memgStart
-    pMem = static_cast<char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
+    pMem = static_cast<unsigned char *>(mmap(NULL, size_mem, PROT_READ | PROT_WRITE,
                                     MAP_SHARED, shm, 0));
 
     if ((void *)pMem == (void *)-1)
@@ -246,30 +244,30 @@ int controlewe::createMemory()
 void controlewe::assingPointers()
 {
 
-    litnum = (int *)(pMem + litnumStart);
+    litnum = (unsigned int *)(pMem + litnumStart);
     // *litnum = -1; // testing
     // *(litnum+1) = 34; // testing
 
-    litstr = (char *)(pMem + litstrStart);
+    litstr = (unsigned char *)(pMem + litstrStart);
     // *litstr = 'h';  // testing
     // *(litstr+1) = 'o'; // testing
     // *(litstr+2) = 'l'; // testing
     // *(litstr+3) = '\0'; // testing
 
-    datanum = (int *)(pMem + dataNumStart);
-    datasrt = (char*)(pMem + datastrStart);
-    workload = (int*)(pMem + workloadStart);
+    datanum = (unsigned int *)(pMem + dataNumStart);
+    datasrt = (unsigned char*)(pMem + datastrStart);
+    workload = (unsigned int*)(pMem + workloadStart);
 
     // datanum = (int *)(dataNumStart);
     // *workload;
 }
 
-void controlewe::assignDataNum(int pos, int num)
+void controlewe::assignDataNum(unsigned int pos, int num)
 {
     *(litnum+pos) = num;
 }
 
-void controlewe::assignDataString(int pos, char word)
+void controlewe::assignDataString(unsigned int pos, char word)
 {
     *(litstr+pos) = word;
 }

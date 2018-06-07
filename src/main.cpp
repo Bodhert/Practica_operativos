@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
     controlewe *controler = new controlewe(arg2, "bews");
 
     if(arg3 == "") cout << "no .mew especified" << endl;
-    else controler->readMemg(arg3); 
+    else controler->readMemg(arg3);
+     
         
 
-    //controler->readMemg()
     return 0;
 }
