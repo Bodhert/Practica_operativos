@@ -1,6 +1,8 @@
 #include <iostream>
 #include "controlewe.h"
 #include "interewe.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -37,22 +39,25 @@ int main(int argc, char *argv[])
 
     if(arg4 == "") cout << "no .bew especified" << endl;
     else interpreter->readBew(arg4);
-     
-     pid_t processes[BinEwe];
-     for(int file =0; file<BinEwe;++file){
-     	if((processes[file] = ::fork())==0){
-     	//cout << "Child: " << processes[file] << endl;
-     	Inter.readBew(argv[2],file);
-     		exit(EXIT_SUCCESS);
 
-     }else{
-     	//cout<< "Father: " << processes[file] << endl;
-     }
- }
- int status;
- for(int file=0; file<BinEwe;++file){
- 	waitpaid(processes[file], &status,0)
-        
- }
+    int eweFiles=argc-4;
+    int archivo = 4;
+	pid_t processes[eweFiles];
+	for(int file =0; file<eweFiles;++file){
+		if((processes[file] = ::fork())==0){
+			interpreter->readBew(argv[archivo]);
+			archivo++;
+			//cout << "Child: " << processes[file] << endl;
+			exit(EXIT_SUCCESS);
+		}else{
+			//cout<< "Father: " << processes[file] << endl;
+		}
+	}
+
+	int status;
+	for(int file=0; file<eweFiles;++file){
+		//waitpaid(processes[file], &status, 0);
+	}
+
  return 0;
 }
