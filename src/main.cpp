@@ -38,7 +38,21 @@ int main(int argc, char *argv[])
     if(arg4 == "") cout << "no .bew especified" << endl;
     else interpreter->readBew(arg4);
      
-        
+     pid_t processes[BinEwe];
+     for(int file =0; file<BinEwe;++file){
+     	if((processes[file] = ::fork())==0){
+     	//cout << "Child: " << processes[file] << endl;
+     	Inter.readBew(argv[2],file);
+     		exit(EXIT_SUCCESS);
 
-    return 0;
+     }else{
+     	//cout<< "Father: " << processes[file] << endl;
+     }
+ }
+ int status;
+ for(int file=0; file<BinEwe;++file){
+ 	waitpaid(processes[file], &status,0)
+        
+ }
+ return 0;
 }
