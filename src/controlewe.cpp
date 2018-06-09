@@ -62,8 +62,10 @@ void controlewe::readMemg(string mew)
     ifstream fileToRead(mew.c_str(), ios::binary);
     for(int i = 0; i < 10; ++i)
     {
-        unsigned int hexNum, base ,  limit;
+        unsigned int hexNum, base , limit;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+
+        memgcopy.push_back(hexNum); // coping the memory;
 
         base = (hexNum & maskBase) >> 16; // geting the base and limit
         limit = (hexNum & maskLimit);
@@ -75,6 +77,7 @@ void controlewe::readMemg(string mew)
                 memgStart = base;
                 memgLimit = limit;
                 // cout << "limits of .memg: base : " << memgStart << " limit: " << memgLimit << endl;
+                // writeMemg(0,hexNum);
                 break;
             case 1:
                 litnumStart = base;
@@ -117,6 +120,7 @@ void controlewe::readMemg(string mew)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        memgcopy.push_back(hexNum); // coping the memory;
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
         // cout << hex << " base A:" << base << " limit A:" << limit << endl;
@@ -129,6 +133,7 @@ void controlewe::readMemg(string mew)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        memgcopy.push_back(hexNum); // coping the memory;
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
         // cout << " base:B " << base  << " limit:B " << limit << endl;
@@ -141,6 +146,7 @@ void controlewe::readMemg(string mew)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        memgcopy.push_back(hexNum); // coping the memory;        
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
         // cout << " base:C " << base  << " limit:C " << limit << endl;
@@ -153,6 +159,7 @@ void controlewe::readMemg(string mew)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
+        memgcopy.push_back(hexNum); // coping the memory;        
         base = (hexNum & maskBase) >> 16;
         limit = (hexNum & maskLimit);
         // cout << " baseDDD:" << base  << " limit:" << limit << endl;
@@ -161,11 +168,14 @@ void controlewe::readMemg(string mew)
         else if(!isDataNum) dataStrPolitics[i] = 'N';
     }
 
+    cout << "memg_size: " << memgcopy.size() << endl;
+
     ajustMemory();
     int iscreated = createMemory();
     // cout <<  "is" << iscreated << endl;
     if(iscreated) return; // breaking the control in case that already created the memory
     assingPointers();
+    writeMemg();
 
     // reading and saving literal num
     // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
@@ -176,33 +186,35 @@ void controlewe::readMemg(string mew)
        fileToRead.read((char *)&hexNum, sizeof(int));
        int signedNum = static_cast<int>(hexNum);
     //    cout << "num: " << dec << signedNum << endl;
-       assignDataNum(i,signedNum);
+       assignDataNum(i,hexNum);
     }
 
-    int posDs = 0;
-    unsigned int hexNum;
-    while(fileToRead.read((char *)&hexNum, sizeof(unsigned int)))
-    {
+    // cout << dec << " " << int(*(litnum+1)) << endl;
 
-        string word_, clean;
-        // cout << hex << hexNum << endl;
-        stringstream ss;
-        ss << hex << hexNum;
-        word_ = ss.str();
-        // cout << "word_"   << word_ << endl;
-        for(int j = 0; j < word_.size(); j+=2)
-        {
-            // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
-            string hexChar = "";
-            hexChar += word_[j]; hexChar += word_[j+1];
-            // cout << "hex: " << hexChar << endl;
-            istringstream converter(hexChar);
-            converter.flags(ios::hex);
-            int i;
-            converter >> hex >> i;
-            // cout << "conversion: " << char(i) << endl;
-            assignDataString(posDs++, char(i));
-        }
+    int posDs = 0;
+    unsigned char dataNum;
+    while(fileToRead.read((char *)&dataNum, sizeof(unsigned char)))
+    {
+        assignDataString(posDs++,dataNum);
+        // string word_, clean;
+        // // cout << hex << hexNum << endl;
+        // stringstream ss;
+        // ss << hex << hexNum;
+        // word_ = ss.str();
+        // // cout << "word_"   << word_ << endl;
+        // for(int j = 0; j < word_.size(); j+=2)
+        // {
+        //     // cout <<  "hexstring: " << word_[j] << word_[j+1] << endl;
+        //     string hexChar = "";
+        //     hexChar += word_[j]; hexChar += word_[j+1];
+        //     // cout << "hex: " << hexChar << endl;
+        //     istringstream converter(hexChar);
+        //     converter.flags(ios::hex);
+        //     int i;
+        //     converter >> hex >> i;
+        //     // cout << "conversion: " << char(i) << endl;
+        //     assignDataString(posDs++, char(i));
+        // }
     }
 
 
@@ -238,6 +250,9 @@ int controlewe::createMemory()
         return 1;
     }
 
+    pMemg = (unsigned int *) pMem;
+    // writeMemg(0,1);// testing
+
     return 0;
 }
 
@@ -270,6 +285,14 @@ void controlewe::assignDataNum(unsigned int pos, int num)
 void controlewe::assignDataString(unsigned int pos, char word)
 {
     *(litstr+pos) = word;
+}
+
+void controlewe::writeMemg()
+{
+    for(int i = 0; i < memgcopy.size(); ++i)
+    {
+        *(pMemg + i) = memgcopy[i];
+    }
 }
 
 controlewe::~controlewe()

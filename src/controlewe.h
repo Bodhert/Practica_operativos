@@ -13,6 +13,8 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <vector>
+
 
 using namespace std;
 
@@ -27,6 +29,7 @@ class controlewe
         void assingPointers();
         void assignDataNum(unsigned int pos, int num);
         void assignDataString(unsigned int pos, char word);
+        void writeMemg();
         virtual ~controlewe();
 
     private:
@@ -41,6 +44,7 @@ class controlewe
 
         // pointers to the memory segments
         unsigned char *pMem;
+        unsigned int *pMemg;
         unsigned int *litnum;
         unsigned char *litstr;
         unsigned int *datanum;
@@ -54,6 +58,9 @@ class controlewe
         // politicas
         map<int,char> dataNumPolitics;
         map<int,char> dataStrPolitics;
+
+        //memgvalues
+        vector<unsigned int> memgcopy;
 
 };
 
