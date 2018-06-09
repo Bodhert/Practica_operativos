@@ -18,8 +18,9 @@ using namespace std;
 class interewe
 {
 	public:
-		interewe();
-		void readBew(string bew);
+		interewe(string ewe_,string memoryName_);
+		void readBew();
+		int getMemory();
 		virtual ~interewe();
 	private:
 		unsigned char *pMem;
@@ -28,6 +29,9 @@ class interewe
         unsigned int *datanum;
         unsigned char *datasrt;
         unsigned int *workload;
+
+		string memoryName, bewfile;
+
 };
 
 #endif

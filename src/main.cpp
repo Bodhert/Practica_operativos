@@ -35,29 +35,34 @@ int main(int argc, char *argv[])
     if(arg3 == "") cout << "no .mew especified" << endl;
     else controler->readMemg(arg3);
 
-    interewe *interpreter = new interewe();
 
+    // later to parse 
     if(arg4 == "") cout << "no .bew especified" << endl;
-    else interpreter->readBew(arg4);
+    else
+    {
+        interewe *interpreter = new interewe(arg4,arg2); // change args for more descirptive names
+        interpreter->readBew();
+        interpreter->getMemory();
+    } 
 
-    int eweFiles=argc-4;
-    int archivo = 4;
-	pid_t processes[eweFiles];
-	for(int file =0; file<eweFiles;++file){
-		if((processes[file] = ::fork())==0){
-			interpreter->readBew(argv[archivo]);
-			archivo++;
-			//cout << "Child: " << processes[file] << endl;
-			exit(EXIT_SUCCESS);
-		}else{
-			//cout<< "Father: " << processes[file] << endl;
-		}
-	}
+    // int eweFiles=argc-4;
+    // int archivo = 4;
+	// pid_t processes[eweFiles];
+	// for(int file =0; file<eweFiles;++file){
+	// 	if((processes[file] = ::fork())==0){
+	// 		interpreter->readBew(argv[archivo]);
+	// 		archivo++;
+	// 		//cout << "Child: " << processes[file] << endl;
+	// 		exit(EXIT_SUCCESS);
+	// 	}else{
+	// 		//cout<< "Father: " << processes[file] << endl;
+	// 	}
+	// }
 
-	int status;
-	for(int file=0; file<eweFiles;++file){
-		//waitpaid(processes[file], &status, 0);
-	}
+	// int status;
+	// for(int file=0; file<eweFiles;++file){
+	// 	//waitpaid(processes[file], &status, 0);
+	// }
 
  return 0;
 }
