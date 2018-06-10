@@ -42,7 +42,6 @@ int main(int argc, char *argv[])
     {
         interewe *interpreter = new interewe(arg4,arg2); // change args for more descirptive names
         interpreter->readBew();
-        interpreter->getMemory();
     } 
 
     // int eweFiles=argc-4;
