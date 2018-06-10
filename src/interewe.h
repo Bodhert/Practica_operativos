@@ -12,8 +12,12 @@
 #include <pthread.h>
 #include <iomanip>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 using namespace std;
+
+typedef pair <unsigned char, unsigned long long> instruction;
 
 class interewe
 {
@@ -31,6 +35,7 @@ class interewe
         unsigned int *workload;
 
 		string memoryName, bewfile;
+		vector<instruction> instructions;
 
 };
 
