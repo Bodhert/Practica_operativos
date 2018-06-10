@@ -37,7 +37,7 @@ void interewe::readBew()
 	unsigned char hexNum, opcode, op;
 	unsigned short memref, integerAdrs, stringAdrs, memrefSource, memrefDestination,
 		memrefOper1, memrefOper2, memrefSize;
-	bool datanum = 0;
+	bool isDatanum = 0;
 
 	while (fileToRead.read((char *)&hexNum, sizeof(unsigned char)))
 	{
@@ -211,7 +211,7 @@ void interewe::readBew()
 				memrefOper2 = ((addr >> 15) & 0x7FF);
 				memrefOper1 = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				datanum = addr & 1;
+				isDatanum = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -227,7 +227,8 @@ void interewe::readBew()
 		instructions.push_back(instruction(opcode, addr));
 	}
 	
-
+	if(getMemory() == 1) return; // fails to ma;
+	assignPointer();
 	// for(int i = 0; i < instructions.size();++i)	
 	// {
 	// 	cout << "instrucciones: " <<  hex  << " opcode: " << int(instructions[i].first)
@@ -245,11 +246,12 @@ void interewe::readBew()
 		switch (opcode)
 		{
 			case 0:
-				// cout << "opcode: " << int(opcode) << endl;
+				cout << "opcode: " << int(opcode) << endl;
 				// cout << hex << " hex:" << addr << endl;
 				addr >>= 30;
 				integerAdrs = (addr & 0x7FFF);
 				memref = (addr >> 15);
+				*(datanum + memref)  =  *(litnum + integerAdrs);
 				// cout << "clean addr: " << hex << addr << endl;
 				// cout << " memref:" << hex << memref << " integerAdr: " << integerAdrs << endl;
 			break;
@@ -260,6 +262,7 @@ void interewe::readBew()
 				addr >>= 30;
 				stringAdrs = (addr & 0x7FFF);
 				memref = (addr >> 15);
+
 				// cout << "clean addr: " << hex << addr << endl;
 				// cout << " memref:" << hex << memref << " integerAdrr: " << stringAdrs << endl;
 			break;
@@ -286,8 +289,8 @@ void interewe::readBew()
 				addr >>= 29;
 				memrefSource = (addr & 0x7FFF);
 				memrefDestination = ((addr >> 15) & 0x7FFF);
-				datanum = addr >> 30; // later to check what to do;
-				if (datanum)		  // do someting in case that datanum is on
+				isDatanum = addr >> 30; // later to check what to do;
+				if (isDatanum)		  // do someting in case that isDatanum is on
 			break;
 
 			case 5:
@@ -298,7 +301,7 @@ void interewe::readBew()
 				memrefOper1 = ((addr >> 15) & 0x7FF);
 				memrefDestination = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				datanum = addr & 1;
+				isDatanum = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -315,8 +318,8 @@ void interewe::readBew()
 				integerAdrs = (addr & 0x7FFF);
 				memrefSource = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
-				datanum = (addr >> 45);
-				if (datanum) // do something
+				isDatanum = (addr >> 45);
+				if (isDatanum) // do something
 			break;
 
 			case 7:
@@ -326,8 +329,8 @@ void interewe::readBew()
 				memrefSource = (addr & 0x7FFF);
 				integerAdrs = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
-				datanum = (addr >> 45);
-				if (datanum) // do something
+				isDatanum = (addr >> 45);
+				if (isDatanum) // do something
 			break;
 
 			case 8:
@@ -369,7 +372,7 @@ void interewe::readBew()
 				memrefOper2 = ((addr >> 15) & 0x7FF);
 				memrefOper1 = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				datanum = addr & 1;
+				isDatanum = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -388,8 +391,7 @@ void interewe::readBew()
 		// cout << hex << "word: " << hexNum << endl;
 	}
 
-	if(getMemory() == 1) return; // fails to ma;
-	assignPointer();
+	
 }
 
 void interewe::assignPointer()
@@ -469,6 +471,8 @@ void interewe::assignPointer()
     // *(litstr+3) = 'Z'; // testing
 
     datanum = (unsigned int *)(pMem + dataNumStart);
+	// *datanum = 4;
+
     datasrt = (unsigned char*)(pMem + datastrStart);
     workload = (unsigned int*)(pMem + workloadStart);
 	
