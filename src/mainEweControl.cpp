@@ -1,6 +1,6 @@
 #include <iostream>
 #include "controlewe.h"
-#include "interewe.h"
+// #include "interewe.h"    
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -37,12 +37,12 @@ int main(int argc, char *argv[])
 
 
     // later to parse 
-    if(arg4 == "") cout << "no .bew especified" << endl;
-    else
-    {
-        interewe *interpreter = new interewe(arg4,arg2); // change args for more descirptive names
-        interpreter->readBew();
-    } 
+    // if(arg4 == "") cout << "no .bew especified" << endl;
+    // else
+    // {
+    //     interewe *interpreter = new interewe(arg4,arg2); // change args for more descirptive names
+    //     interpreter->readBew();
+    // } 
 
     // int eweFiles=argc-4;
     // int archivo = 4;

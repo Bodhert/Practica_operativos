@@ -46,7 +46,7 @@ class interewe
 		string memoryName, bewfile;
 		vector<instruction> instructions;
 
-		const int maskLimit = 0xFFFF;
+		const int maskLimit = 0xFFFF; 
 
 };
 

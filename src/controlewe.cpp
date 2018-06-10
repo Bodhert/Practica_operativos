@@ -116,7 +116,7 @@ void controlewe::readMemg(string mew)
         }
     }
 
-    for(int i = 0; i < linesPrioWriters; ++i)
+    for(unsigned int i = 0; i < linesPrioWriters; ++i)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
@@ -129,7 +129,7 @@ void controlewe::readMemg(string mew)
         else if(!isDataNum) dataStrPolitics[i] = 'L';
     }
 
-    for(int i = 0; i < linesPrioReaders; ++i)
+    for(unsigned int i = 0; i < linesPrioReaders; ++i)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
@@ -142,7 +142,7 @@ void controlewe::readMemg(string mew)
         else if(!isDataNum) dataStrPolitics[i] = 'E';
     }
 
-    for(int i = 0; i < block; ++i)
+    for(unsigned int i = 0; i < block; ++i)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
@@ -155,7 +155,7 @@ void controlewe::readMemg(string mew)
         else if(!isDataNum) dataStrPolitics[i] = 'B';
     }
 
-    for(int i = 0; i < noControl; ++i)
+    for(unsigned int i = 0; i < noControl; ++i)
     {
         unsigned int base ,  limit , hexNum;
         fileToRead.read((char *)&hexNum, sizeof(unsigned int));
@@ -179,7 +179,7 @@ void controlewe::readMemg(string mew)
 
     // reading and saving literal num
     // cout <<  hex << " litnumLimit: " << litnumLimit << endl;
-    for(int i = 0; i < litnumLines; ++i)
+    for(unsigned int i = 0; i < litnumLines; ++i)
     {
         // cout << "i:" << i << en
        int num,  hexNum;
@@ -289,7 +289,7 @@ void controlewe::assignDataString(unsigned int pos, char word)
 
 void controlewe::writeMemg()
 {
-    for(int i = 0; i < memgcopy.size(); ++i)
+    for(unsigned int i = 0; i < memgcopy.size(); ++i)
     {
         *(pMemg + i) = memgcopy[i];
     }
