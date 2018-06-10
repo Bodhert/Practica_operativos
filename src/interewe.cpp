@@ -388,7 +388,7 @@ void interewe::readBew()
 		// cout << hex << "word: " << hexNum << endl;
 	}
 
-	getMemory();
+	if(getMemory() == 1) return; // fails to ma;
 	assignPointer();
 }
 
