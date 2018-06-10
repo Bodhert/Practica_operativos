@@ -33,7 +33,7 @@ class interewe
         unsigned int *litnum;
         unsigned char *litstr;
         unsigned int *datanum;
-        unsigned char *datasrt;
+        unsigned char *datastr;
         unsigned int *workload;
 
 		unsigned int memgStart, memgLimit;

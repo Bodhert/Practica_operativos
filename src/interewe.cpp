@@ -34,10 +34,11 @@ void interewe::readBew()
 
 	// sometimes it fails we do not why
 	unsigned long long addr;
-	unsigned char hexNum, opcode, op;
+	unsigned char hexNum, opcode, op , current;
 	unsigned short memref, integerAdrs, stringAdrs, memrefSource, memrefDestination,
 		memrefOper1, memrefOper2, memrefSize;
-	bool isDatanum = 0;
+	unsigned int displacement;
+	bool flag = 0;
 
 	while (fileToRead.read((char *)&hexNum, sizeof(unsigned char)))
 	{
@@ -211,7 +212,7 @@ void interewe::readBew()
 				memrefOper2 = ((addr >> 15) & 0x7FF);
 				memrefOper1 = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				isDatanum = addr & 1;
+				flag = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -235,13 +236,13 @@ void interewe::readBew()
 	// 	<<  " addr: " << instructions[i].second  << endl;
 	// }
 
-	for (int i = 0; i < instructions.size();++i)
+	for (int PC = 0; PC < instructions.size();++PC)
 	{
 
 		// cout << "instrucciones: " <<  hex << instructions[i] << endl;
 		
-		opcode = instructions[i].first;
-		addr = instructions[i].second;
+		opcode = instructions[PC].first;
+		addr = instructions[PC].second;
 		// cout << "opcode: " << int(opcode) << " addr:" << addr << endl;
 		switch (opcode)
 		{
@@ -263,6 +264,16 @@ void interewe::readBew()
 				stringAdrs = (addr & 0x7FFF);
 				memref = (addr >> 15);
 
+				displacement = 0;
+				current = *(litstr + stringAdrs);
+				while(current)
+				{
+					*(datastr+memref+displacement) = current;
+					++displacement;
+					current = *(litstr + stringAdrs+displacement);
+				}
+				*(datastr+memref+displacement) = current;
+
 				// cout << "clean addr: " << hex << addr << endl;
 				// cout << " memref:" << hex << memref << " integerAdrr: " << stringAdrs << endl;
 			break;
@@ -273,6 +284,8 @@ void interewe::readBew()
 				addr >>= 30;
 				integerAdrs = (addr & 0x7FFF);
 				memref = (addr >> 15);
+
+				*(datanum + memref) = PC + integerAdrs;
 				// cout << "clean addr: " << hex << addr << endl;
 				// cout << " memref: " << hex << memref << " integerAdrr: " << integerAdrs << endl;
 			break;
@@ -281,6 +294,7 @@ void interewe::readBew()
 				// cout << "opcode: " << int(opcode) << endl;
 				// cout << hex << " hex:" << addr << endl;
 				memref = addr >> 13;
+				PC = memref;
 			break;
 
 			case 4:
@@ -289,8 +303,16 @@ void interewe::readBew()
 				addr >>= 29;
 				memrefSource = (addr & 0x7FFF);
 				memrefDestination = ((addr >> 15) & 0x7FFF);
-				isDatanum = addr >> 30; // later to check what to do;
-				if (isDatanum)		  // do someting in case that isDatanum is on
+				flag = addr >> 30;
+				if (flag)
+				{
+					*(datanum + memrefDestination) = *(datanum + memrefSource);
+				}
+				else
+				{
+					// ahora se hace .
+					displacement = 0;
+				}
 			break;
 
 			case 5:
@@ -301,7 +323,7 @@ void interewe::readBew()
 				memrefOper1 = ((addr >> 15) & 0x7FF);
 				memrefDestination = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				isDatanum = addr & 1;
+				flag = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -318,8 +340,8 @@ void interewe::readBew()
 				integerAdrs = (addr & 0x7FFF);
 				memrefSource = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
-				isDatanum = (addr >> 45);
-				if (isDatanum) // do something
+				flag = (addr >> 45);
+				if (flag) // do something
 			break;
 
 			case 7:
@@ -329,8 +351,8 @@ void interewe::readBew()
 				memrefSource = (addr & 0x7FFF);
 				integerAdrs = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
-				isDatanum = (addr >> 45);
-				if (isDatanum) // do something
+				flag = (addr >> 45);
+				if (flag) // do something
 			break;
 
 			case 8:
@@ -372,7 +394,7 @@ void interewe::readBew()
 				memrefOper2 = ((addr >> 15) & 0x7FF);
 				memrefOper1 = ((addr >> 30) & 0x7FF);
 				addr >>= 45;
-				isDatanum = addr & 1;
+				flag = addr & 1;
 				op = addr >> 1;
 			break;
 
@@ -473,7 +495,7 @@ void interewe::assignPointer()
     datanum = (unsigned int *)(pMem + dataNumStart);
 	// *datanum = 4;
 
-    datasrt = (unsigned char*)(pMem + datastrStart);
+    datastr = (unsigned char*)(pMem + datastrStart);
     workload = (unsigned int*)(pMem + workloadStart);
 	
 }
