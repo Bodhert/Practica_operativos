@@ -1,8 +1,8 @@
 # Practica_operativos
 # Interpretador paralelo de BINEWE 
-   ### Sistemas Operativos
+## Sistemas Operativos
   
-  # INTEGRANTES:
+## INTEGRANTES:
 
 - **ALEJANDRO CORDOBA BODHERT**
 - **CRAIG DAVID CARTAGENA CASTANO**
@@ -40,12 +40,6 @@
    
 
    
-   ## EJECUCION
-   
-   se ejecuta con C++11
-   
-
-  ``` $ g++ -std=c++11 -o controlewe src/main.cpp src/controlewe.cpp src/interewe.cpp -lrt -lpthread ```
 
 
    
