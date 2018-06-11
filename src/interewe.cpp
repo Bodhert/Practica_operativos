@@ -312,6 +312,14 @@ void interewe::readBew()
 				{
 					// ahora se hace .
 					displacement = 0;
+					current = *(datastr + memrefSource);
+					while(current)
+					{
+						*(datastr + memrefDestination + displacement) = current;
+						++displacement;
+						current = *(datastr + memrefSource + displacement);
+					}
+					*(datastr + memrefDestination + displacement) = current;
 				}
 			break;
 
@@ -325,6 +333,150 @@ void interewe::readBew()
 				addr >>= 45;
 				flag = addr & 1;
 				op = addr >> 1;
+				if(flag)
+				{
+					switch(op)
+					{
+						case 0:
+							*(datanum + memrefDestination) = 
+								*(datanum + memrefOper1) + *(datanum + memrefOper1);
+						break;
+
+						case 1:
+							*(datanum + memrefDestination) = 
+								*(datanum + memrefOper1) - *(datanum + memrefOper1);
+						break;
+
+						case 2:
+						*(datanum + memrefDestination) = 
+								*(datanum + memrefOper1) * *(datanum + memrefOper1);
+						break;
+
+						case 3:
+						*(datanum + memrefDestination) = 
+								*(datanum + memrefOper1) / *(datanum + memrefOper1);
+						break;
+
+						case 4:
+						*(datanum + memrefDestination) = 
+							*(datanum + memrefOper1) - *(datanum + memrefOper1);
+						break;
+
+						case 5:
+						*(datanum + memrefDestination) = 
+								*(datanum + memrefOper1) % *(datanum + memrefOper1);
+						break;
+					}
+				}
+				else 
+				{
+					string memrefOper1_String = "" , memrefOper2_String = "", 
+							result = "";
+					char curr_oper1, curr_oper2;
+
+					curr_oper1 = *(datastr + memrefOper1);
+					displacement = 0;
+					while(curr_oper1)
+					{
+						memrefOper1_String += curr_oper1;
+						++displacement;
+						curr_oper1 = *(datastr + memrefOper1 + displacement);
+					}
+
+					memrefOper1_String += curr_oper1;
+
+					displacement = 0;
+
+					while(curr_oper2)
+					{
+						memrefOper1_String += curr_oper2;
+						++displacement;
+						curr_oper2 = *(datastr + memrefOper2 + displacement);
+					}
+
+					memrefOper2_String += curr_oper1;
+
+
+					int sizeOper1 = memrefOper1_String.size();
+					int sizeOper2 = memrefOper2_String.size();
+					int maxzise = max(sizeOper1,sizeOper2);
+
+
+
+					switch(op)
+					{
+						case 0:
+							for(int i = 0; i < maxzise; ++i)
+							{
+								if(sizeOper1 < i && sizeOper2 < i) 
+									result += char(memrefOper1_String[i]) + 
+											  char(memrefOper2_String[i]);
+								else if(i > sizeOper1)
+									result += char(memrefOper2_String[i]);
+								else if(i > sizeOper2)
+									result += char(memrefOper1_String[i]);									
+							}
+						break;
+
+						case 1:
+							for(int i = 0; i < maxzise; ++i)
+							{
+								if(sizeOper1 < i && sizeOper2 < i) 
+									result += char(memrefOper1_String[i]) -
+											  char(memrefOper2_String[i]);
+								else if(i > sizeOper1)
+									result += char(memrefOper2_String[i]);
+								else if(i > sizeOper2)
+									result += char(memrefOper1_String[i]);									
+							}
+						break;
+
+						case 2:
+							for(int i = 0; i < maxzise; ++i)
+							{
+								if(sizeOper1 < i && sizeOper2 < i) 
+									result += char(memrefOper1_String[i]) *
+											  char(memrefOper2_String[i]);
+								else if(i > sizeOper1)
+									result += char(memrefOper2_String[i]);
+								else if(i > sizeOper2)
+									result += char(memrefOper1_String[i]);									
+							}
+						break;
+
+						case 3:
+							for(int i = 0; i < maxzise; ++i)
+							{
+								if(sizeOper1 < i && sizeOper2 < i) 
+									result += char(memrefOper1_String[i]) /
+											  char(memrefOper2_String[i]);
+								else if(i > sizeOper1)
+									result += char(memrefOper2_String[i]);
+								else if(i > sizeOper2)
+									result += char(memrefOper1_String[i]);									
+							}
+						break;
+
+						case 4:
+							for(int i = 0; i < maxzise; ++i)
+							{
+								if(sizeOper1 < i && sizeOper2 < i) 
+									result += char(memrefOper1_String[i]) % 
+											  char(memrefOper2_String[i]);
+								else if(i > sizeOper1)
+									result += char(memrefOper2_String[i]);
+								else if(i > sizeOper2)
+									result += char(memrefOper1_String[i]);									
+							}
+						break;
+					}
+
+
+					for(int i = 0; i < result.size(); ++i)
+					{
+						*(datastr + memrefDestination + i) = result[i];
+					}
+				}
 			break;
 
 			case 6:
@@ -341,7 +493,16 @@ void interewe::readBew()
 				memrefSource = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
 				flag = (addr >> 45);
-				if (flag) // do something
+				if (flag) 
+				{
+					*(datanum + memrefDestination) = 
+						*(datanum + (memrefSource + integerAdrs));
+				}
+				else
+				{
+					*(datastr + memrefDestination) = 
+						*(datastr + (memrefSource + integerAdrs));
+				}
 			break;
 
 			case 7:
@@ -352,7 +513,16 @@ void interewe::readBew()
 				integerAdrs = ((addr >> 15) & 0x7FFF);
 				memrefDestination = ((addr >> 30) & 0x7FFF);
 				flag = (addr >> 45);
-				if (flag) // do something
+				if (flag) 
+				{
+					*(datanum + memrefDestination + integerAdrs) = 
+						*(datanum + memrefSource);
+				}
+				else
+				{
+					*(datastr + memrefDestination + integerAdrs) = 
+						*(datastr + memrefSource);
+				}
 			break;
 
 			case 8:
