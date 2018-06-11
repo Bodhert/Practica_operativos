@@ -2,7 +2,7 @@
 # Interpretador paralelo de BINEWE 
 ## Sistemas Operativos
   
-## INTEGRANTES:
+#INTEGRANTES:
 
 - **ALEJANDRO CORDOBA BODHERT**
 - **CRAIG DAVID CARTAGENA CASTANO**
