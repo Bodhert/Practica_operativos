@@ -22,13 +22,13 @@
 
 
 
-  ## DESCRIPCION DEL PROYECTO
+# DESCRIPCION DEL PROYECTO
   
   Para el proyecto final de la materia de sistemas operativos de la universidad EAFIT 2018-1 nos proponen realizar un interpretador paralelo de BINEWE, aplicando el manejo de memoria y la concurrencia.
 
-  ## TECNOLOGIAS
+# TECNOLOGIAS
   
-  ![c++](cplusplus.png)
+  ![c++](c++.png)
 
    - [C++](http://www.cplusplus.com): C++ es un lenguaje de programación diseñado a mediados de los años 1979 por Bjarne Stroustrup. La intención de su creación fue el extender al lenguaje de programación C mecanismos que permiten la manipulación de objetos.. 
    
