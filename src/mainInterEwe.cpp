@@ -35,24 +35,5 @@ int main(int argc, char *argv[])
     interpreter->readBew();
      
 
-    // int eweFiles=argc-4;
-    // int archivo = 4;
-	// pid_t processes[eweFiles];
-	// for(int file =0; file<eweFiles;++file){
-	// 	if((processes[file] = ::fork())==0){
-	// 		interpreter->readBew(argv[archivo]);
-	// 		archivo++;
-	// 		//cout << "Child: " << processes[file] << endl;
-	// 		exit(EXIT_SUCCESS);
-	// 	}else{
-	// 		//cout<< "Father: " << processes[file] << endl;
-	// 	}
-	// }
-
-	// int status;
-	// for(int file=0; file<eweFiles;++file){
-	// 	//waitpaid(processes[file], &status, 0);
-	// }
-
  return 0;
 }

@@ -583,6 +583,8 @@ void interewe::readBew()
 		// cout << hex << "word: " << hexNum << endl;
 	}
 
+	fileToRead.seekg(0, fileToRead.beg);
+    fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
 	
 }
 
