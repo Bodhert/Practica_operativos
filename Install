@@ -1,1 +1,10 @@
-g++ -std=c++11 -o controlewe src/main.cpp src/controlewe.cpp src/interewe.cpp -lrt -lpthread
+- En Practica_operativos se encuentra el Makefile. al ingresar en consola make se instala el programa.
+
+- Ya generado el ejecutable interewe y controlewe. al ingresar en consola el controlador: controlewe -n <nommemcom> <ficherobinewe> 
+
+ejemplo: ./controlewe -n memoria src/ficheros_entrada/bews/mac.bew 
+src/ficheros_entrada/bews/mac.bew
+
+y en la direccion /dev/shm/  aparece el nombre de la memoria, en este caso memoria. y ya luego se pasa el interpretador con las instrucciones.
+
+ejemplo: ./interewe -n memoria2 src/ficheros_entrada/bews/mac.bew

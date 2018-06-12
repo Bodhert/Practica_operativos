@@ -527,6 +527,7 @@ void interewe::readBew()
 
 			case 8:
 				// cout << "opcode: " << int(opcode) << endl;
+				
 				memref = addr >> 13;
 			break;
 

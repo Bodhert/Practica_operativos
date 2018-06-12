@@ -75,16 +75,16 @@ int main(int argc, char *argv[])
         // exec the program in termianl with treads;
         int link[2];
         char foo[4096];
-        if(pipe(link) == -1)
-        {
-            exit(EXIT_FAILURE);
-        }  
+        // if(pipe(link) == -1)
+        // {
+        //     exit(EXIT_FAILURE);
+        // }  
     //     // int archivo = 4;
         pid_t processes[bewsFilesSize];
         for(int file = 0; file < bewsFilesSize ; ++file) // queme para probar , recordar quitar el -1
         {
 
-            cout << "bew: "<< bews[file] << "  memory name: " << memoryName << endl;
+            // cout << "bew: "<< bews[file] << "  memory name: " << memoryName << endl;
 
         	if((processes[file] = ::fork()) == -1){
                 perror("Exec Process Failed");
@@ -95,7 +95,14 @@ int main(int argc, char *argv[])
                 dup2(link[1], STDOUT_FILENO);
                 close(link[0]);
                 close(link[1]);
-                execlp( "./interewe", "./interewe", "-n", memoryName.c_str(), bews[file], NULL);
+                char *args[5];
+                // const char *mycharp = memoryName.c_str();
+                args[0] = "./interewe";
+                args[1] = "-n";
+                args[2] = const_cast<char*>(memoryName.c_str());
+                args[3] = const_cast<char*>(bews[file].c_str());
+                args[4] = NULL;
+                execvp( "./interewe", args);
                 _exit(EXIT_SUCCESS);
         	}
             else
