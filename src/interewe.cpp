@@ -40,6 +40,10 @@ void interewe::readBew()
 	unsigned int displacement;
 	bool flag = 0;
 
+	int readInt;
+
+	string readString;
+
 	while (fileToRead.read((char *)&hexNum, sizeof(unsigned char)))
 	{
 		// cout << hex << hexNum << endl;
@@ -237,12 +241,12 @@ void interewe::readBew()
 	// }
 
 	//testig semaphore of read and write
-	int test;
-	sem_wait(&(*(workload + 0)));
-	cout << "The procces: " << getpid() << " is waiting for input" << endl;
-	cin >> test;
-	cout << "The procces: " << getpid() << " already read " << endl;
-	sem_post(&(*(workload + 0)));
+	// int test;
+	// sem_wait(&(*(workload + 0)));
+	// cout << "The procces: " << getpid() << " is waiting for input" << endl;
+	// cin >> test;
+	// cout << "The procces: " << getpid() << " already read " << endl;
+	// sem_post(&(*(workload + 0)));
 
 	for (int PC = 0; PC < instructions.size();++PC)
 	{
@@ -535,14 +539,23 @@ void interewe::readBew()
 
 			case 8:
 				// cout << "opcode: " << int(opcode) << endl;
-				
-				memref = addr >> 13;
+					memref = addr >> 13;
+					sem_wait(&(*(workload + 0)));
+					cout << "The procces: " << getpid() << " is waiting an Int for input" << endl;
+					cin >> readInt;
+					cout << "The procces: " << getpid() << " already read " << endl;
+					sem_post(&(*(workload + 0)));
+					*(datanum + memref) = readInt;
 			break;
 
 			case 9:
 				// cout << "opcode: " << int(opcode) << endl;
 				// cout << hex << " hex:" << addr << endl;
 				memref = addr >> 13;
+				sem_wait(&(*(workload + 0)));
+				cout << "The procces: " << getpid() << " is writing " << endl <<
+						dec << *(datanum + memref);
+				sem_post(&(*(workload + 0)));
 			break;
 
 			case 10:
@@ -551,18 +564,41 @@ void interewe::readBew()
 				addr >>= 30;
 				memrefSize = (addr & 0x7FFF);
 				memrefDestination = addr >> 15;
+				sem_wait(&(*(workload + 0)));
+				cout << "the procces: " << getpid() << " is waiting for a string" << endl;
+				cin >> readString;
+				sem_post(&(*(workload + 0)));
+				for(current= 0; current < readString.size() && current < memrefSize; current)
+				{
+					*(datastr + memrefDestination + current) = readString[current];
+				}
+					*(datastr + memrefDestination + current) = 0;
+
+
 			break;
 
 			case 11:
 				// cout << "opcode: " << int(opcode) << endl;
 				// cout << hex << " hex:" << addr << endl;
 				memref = addr >> 13;
+				current = *(datastr + addr);
+				displacement = 0;
+				sem_wait(&(*(workload + 0)));
+				while(current)
+				{
+					cout << current;
+					++displacement;
+					current = *(datastr + addr + displacement);
+				}
+				sem_post(&(*(workload + 0)));
+				cout << endl;
 			break;
 
 			case 12:
 				// cout << "opcode: " << int(opcode) << endl;
 				// cout << hex << " hex:" << addr << endl;
 				integerAdrs = addr >> 13;
+				PC = *(litnum + integerAdrs);
 			break;
 
 			case 13:
@@ -575,14 +611,94 @@ void interewe::readBew()
 				addr >>= 45;
 				flag = addr & 1;
 				op = addr >> 1;
+				if(flag)
+				{
+					switch(op)
+					{
+						case 0:
+							if(*(datanum + memrefOper1) >= *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);
+						break;
+
+						case 1:
+							if(*(datanum + memrefOper1) > *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);
+						break;
+
+						case 2:
+							if(*(datanum + memrefOper1) <= *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);
+						
+						break;
+
+						case 3:
+							if(*(datanum + memrefOper1) < *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);
+
+						break;
+
+						case 4:
+							if(*(datanum + memrefOper1) == *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);
+						break;
+
+						case 5:
+							if(*(datanum + memrefOper1) != *(datanum + memrefOper2))
+								PC = *(litnum + integerAdrs);							
+						break;
+					}
+				}
+				else
+				{
+					switch(op)
+					{
+
+						case 0:
+								if(*(datastr + memrefOper1) >= *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);
+							break;
+
+							case 1:
+								if(*(datastr + memrefOper1) > *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);
+							break;
+
+							case 2:
+								if(*(datastr + memrefOper1) <= *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);
+							
+							break;
+
+							case 3:
+								if(*(datastr + memrefOper1) < *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);
+
+							break;
+
+							case 4:
+								if(*(datastr + memrefOper1) == *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);
+							break;
+
+							case 5:
+								if(*(datastr + memrefOper1) != *(datastr + memrefOper2))
+									PC = *(litnum + integerAdrs);							
+							break;
+					}
+					
+				}
 			break;
 
 			case 14:
 				// cout << dec << "opcode: " << int(opcode) << endl;
+				return;
 			break;
 
 			case 15:
 				// cout << dec << "opcode: " << int(opcode) << endl;
+				sem_wait(&(*(workload + 0)));
+				cout << "input 'c' for continue the procces " << endl;
+				sem_post(&(*(workload + 0)));
 			break;
 		}
 		// cout << endl;
