@@ -14,6 +14,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <semaphore.h>
 
 using namespace std;
 
@@ -34,7 +35,7 @@ class interewe
         unsigned char *litstr;
         unsigned int *datanum;
         unsigned char *datastr;
-        unsigned int *workload;
+        sem_t *workload;
 
 		unsigned int memgStart, memgLimit;
         unsigned int litnumStart, litnumLimit;

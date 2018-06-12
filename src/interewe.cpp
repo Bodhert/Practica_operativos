@@ -236,6 +236,14 @@ void interewe::readBew()
 	// 	<<  " addr: " << instructions[i].second  << endl;
 	// }
 
+	//testig semaphore of read and write
+	int test;
+	sem_wait(&(*(workload + 0)));
+	cout << "The procces: " << getpid() << " is waiting for input" << endl;
+	cin >> test;
+	cout << "The procces: " << getpid() << " already read " << endl;
+	sem_post(&(*(workload + 0)));
+
 	for (int PC = 0; PC < instructions.size();++PC)
 	{
 
@@ -669,7 +677,7 @@ void interewe::assignPointer()
 	// *datanum = 4;
 
     datastr = (unsigned char*)(pMem + datastrStart);
-    workload = (unsigned int*)(pMem + workloadStart);
+    workload = (sem_t *)(pMem + workloadStart);
 	
 }
 

@@ -217,6 +217,11 @@ void controlewe::readMemg(string mew)
         // }
     }
 
+    // semphores management
+    sem_t in_out_buffer;
+    sem_init(&in_out_buffer,1,1); // shared in a file of the sytem
+    *(workload + 0 ) = in_out_buffer;
+
 
     fileToRead.seekg(0, fileToRead.beg);
     fileToRead.close(); // avoiding that a buffer stays open (previous experiences)
@@ -271,7 +276,7 @@ void controlewe::assingPointers()
 
     datanum = (unsigned int *)(pMem + dataNumStart);
     datasrt = (unsigned char*)(pMem + datastrStart);
-    workload = (unsigned int*)(pMem + workloadStart);
+    workload = (sem_t*)(pMem + workloadStart);
 
     // datanum = (int *)(dataNumStart);
     // *workload;

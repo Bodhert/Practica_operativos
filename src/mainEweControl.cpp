@@ -110,13 +110,11 @@ int main(int argc, char *argv[])
                 close(link[1]);
                 int nbytes = read(link[0], foo, sizeof(foo));
                 printf("\nOutput: (%.*s)\n", nbytes, foo);
+                int status;
+                waitpid(processes[file], &status, 0);
             }
         }
 
-        int status;
-        for(int file=0; file<bewsFilesSize;++file){
-        	waitpid(processes[file], &status, 0);
-        }
 
     }
     else 

@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <pthread.h>
+#include <semaphore.h>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -49,7 +50,7 @@ class controlewe
         unsigned char *litstr;
         unsigned int *datanum;
         unsigned char *datasrt;
-        unsigned int *workload;  // have my doubts about what is the type of the workload
+        sem_t *workload;  // have my doubts about what is the type of the workload
 
         // mascaras de bits
         const int maskBase = 0xFFFF0000;
