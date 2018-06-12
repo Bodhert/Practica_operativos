@@ -1,6 +1,6 @@
 CC = g++ -std=c++11
 CFLAGS = -c 
-LDFLAGS = -lrt
+LDFLAGS = -lrt -lpthread
 CONTROL_SOURCES = src/mainEweControl.cpp src/controlewe.cpp
 CONTROL_OBJECTS = $(CONTROL_SOURCES:.cpp=.o)
 CONTROL_EXECUTABLE = controlewe

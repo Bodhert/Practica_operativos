@@ -14,9 +14,9 @@ int main(int argc, char *argv[])
     // }
 
 
-    // string memoryOptionName = (argc > 1) ?  string(argv[1]) : "" ;
-    // string memoryName = (argc > 2) ?  string(argv[2]) : "" ;
-    // string ficheroBinEwe = (argc > 3) ?  string(argv[3]) : "" ;
+    string memoryOptionName = (argc > 1) ?  string(argv[1]) : "" ;
+    string memoryName = (argc > 2) ?  string(argv[2]) : "" ;
+    string ficheroBinEwe = (argc > 3) ?  string(argv[3]) : "" ;
 
     // cout << "memoryOptionName: " <<  memoryOptionName  << "  memoryName: " << 
     //         memoryName << " ficheroBinewe: " << ficheroBinEwe << endl;
